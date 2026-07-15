@@ -1,0 +1,6 @@
+*build/
+.exe
+.vscode
+tempCodeRunnerFile.
+venv/
+__pycache__*
