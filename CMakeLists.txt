@@ -7,12 +7,19 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(Missile 
 main.cpp
 render.cpp
+physics.cpp
+header.cpp
 )
 
 find_package(Eigen3 REQUIRED)
 
 find_package(spdlog REQUIRED)
 
+find_package(SFML 3 REQUIRED COMPONENTS Graphics Window System)
+
 target_link_libraries(Missile PRIVATE
  Eigen3::Eigen
- spdlog::spdlog)
+ spdlog::spdlog
+ SFML::Graphics
+ SFML::Window
+ SFML::System)

@@ -1,3 +1,3 @@
 #include "header.h"
 
-main();
+obj state;
