@@ -15,6 +15,12 @@ void render(obj& state){
     track.setPosition({0.f,580.f});
     track.setFillColor({70, 70 , 70});
 
+    std::vector<sf::Vector2f> missileTrail;
+    VertexArray trajectory(sf::PrimitiveType::LineStrip);
+
+    VertexArray missileTrajectory(sf::PrimitiveType::LineStrip);
+    VertexArray jetTrajectory(sf::PrimitiveType::LineStrip);
+
     Texture bg;
     if (!bg.loadFromFile("../assets/sky.jpeg"))
     {
@@ -31,8 +37,12 @@ void render(obj& state){
     return;
     }
     Sprite jet(jettex);
-    jet.setPosition({0.f,270.f});
-    jet.setScale({0.10f,0.10f});
+    auto jetSize = jettex.getSize();
+
+    jet.setOrigin({jetSize.x / 2.f,jetSize.y / 2.f});
+
+jet.setScale({0.10f, 0.10f});
+jet.setPosition({0.f, 270.f});
 
     Texture mistex;
     if (!mistex.loadFromFile("../assets/missile.png"))
@@ -41,11 +51,18 @@ void render(obj& state){
     return;
     }
     Sprite missile(mistex);
-     missile.setPosition({390.f,570.f});
-    missile.setScale({0.10f,0.08f});
+
+    auto size = mistex.getSize();
+    missile.setOrigin({size.x / 2.f,size.y / 2.f});
+
+    missile.setScale({0.10f, 0.08f});
+    missile.setPosition({390.f, 570.f});
     
+    bool paused = false;
+    int run = 0;
 
     while(window.isOpen()){
+        run++;
 
         while(std:: optional event = window.pollEvent()){
             if(event->is<Event::Closed>()){
@@ -56,15 +73,25 @@ void render(obj& state){
             }
         }
 
-        state.jx++;
-        state.my++;
+        if(run == 1){
+            state.jx = 0;
+            state.my = 0;
+        }  
+
+        physics((0.f+ state.jx - 390.f - state.mx) , (270.f - 570.f + state.my));
 
         jet.setPosition({0.f+ state.jx,270.f});
-        missile.setPosition({390.f,570.f - state.my});
+        missile.setPosition({390.f + state.mx,570.f - state.my});
+        missileTrail.push_back(missile.getPosition());
+
+        trajectory.append({missile.getPosition(),Color::Red});
+        jetTrajectory.append({jet.getPosition(),Color::Green});
 
         window.clear();
         
         window.draw(background);
+        window.draw(trajectory);
+        window.draw(jetTrajectory);
         window.draw(track);
         window.draw(missile);
         window.draw(jet);

@@ -7,8 +7,5 @@
 using namespace std;
 
 int main(){
-    obj state;
-    state.jx = 0;
-    state.my = 0;
     render(state);
 }

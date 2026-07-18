@@ -1,12 +1,15 @@
 #pragma once
 
 struct obj{
-    int mx = 0;
-    int my = 0;
-    int jx = 0;
-    int jy = 0;
+    float mx;
+    float my;
+    float jx;
+    float jy;
+    float jx_d;
+    float my_d;
 };
 
 extern obj state;
 
 void render(obj& state);
+void physics(float dx, float dy);
