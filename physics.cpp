@@ -10,4 +10,6 @@ void physics(float dx, float dy){
     state.jx += 1;
     state.my -= speed * dy/dist;
     state.mx += speed * dx / dist;
+
+    state.thetaM = atan2(dy,dx);
 }

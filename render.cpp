@@ -82,6 +82,7 @@ jet.setPosition({0.f, 270.f});
 
         jet.setPosition({0.f+ state.jx,270.f});
         missile.setPosition({390.f + state.mx,570.f - state.my});
+        missile.setRotation(radians(state.thetaM + 3.14159265f/2.f));
         missileTrail.push_back(missile.getPosition());
 
         trajectory.append({missile.getPosition(),Color::Red});
