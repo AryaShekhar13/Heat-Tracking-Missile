@@ -5,13 +5,16 @@ struct obj{
     float my;
     float jx;
     float jy;
-    float jx_d;
-    float my_d;
+
     float thetaM;
+    float thetaJ;
+
+    float jx_d;
+    float jy_d;
 };
 
 extern obj state;
-// float PI = 3.14159265f;
+constexpr float PI = 3.14159265f;
 
 void render(obj& state);
-void physics(float dx, float dy);
+void physics(float dx, float dy, float& t);

@@ -3,6 +3,7 @@
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
 #include <iostream>
+#include <cmath>
 #include "header.h"
 
 using namespace sf;
@@ -38,11 +39,20 @@ void render(obj& state){
     }
     Sprite jet(jettex);
     auto jetSize = jettex.getSize();
+    float jetLength = jetSize.x * 0.10f;
+    float jetHeight = jetSize.y * 0.08f;
+
+    RectangleShape jetHitbox;
+    jetHitbox.setSize({jetLength * 0.85f,jetHeight* 0.85f});
+    jetHitbox.setOrigin({jetHitbox.getSize().x / 2.f,jetHitbox.getSize().y / 2.f});
+    jetHitbox.setFillColor(Color::Transparent);
+    jetHitbox.setOutlineColor(Color::Yellow);
+    jetHitbox.setOutlineThickness(1.f);
 
     jet.setOrigin({jetSize.x / 2.f,jetSize.y / 2.f});
 
-jet.setScale({0.10f, 0.10f});
-jet.setPosition({0.f, 270.f});
+    jet.setScale({0.10f, 0.10f});
+    jet.setPosition({0.f, 270.f});
 
     Texture mistex;
     if (!mistex.loadFromFile("../assets/missile.png"))
@@ -51,8 +61,9 @@ jet.setPosition({0.f, 270.f});
     return;
     }
     Sprite missile(mistex);
-
     auto size = mistex.getSize();
+    float missileLength = size.x * 0.10f;
+
     missile.setOrigin({size.x / 2.f,size.y / 2.f});
 
     missile.setScale({0.10f, 0.08f});
@@ -60,6 +71,7 @@ jet.setPosition({0.f, 270.f});
     
     bool paused = false;
     int run = 0;
+    float total = 0;
 
     while(window.isOpen()){
         run++;
@@ -78,12 +90,35 @@ jet.setPosition({0.f, 270.f});
             state.my = 0;
         }  
 
-        physics((0.f+ state.jx - 390.f - state.mx) , (270.f - 570.f + state.my));
+        
+    float dx = state.jx - 390.f - state.mx;
+    float dy = 270.f - state.jy - 570.f + state.my;
 
-        jet.setPosition({0.f+ state.jx,270.f});
-        missile.setPosition({390.f + state.mx,570.f - state.my});
-        missile.setRotation(radians(state.thetaM + 3.14159265f/2.f));
-        missileTrail.push_back(missile.getPosition());
+    if (!paused) physics(dx, dy, total);
+
+    jet.setPosition({0.f+ state.jx, 270.f - state.jy});
+    missile.setPosition({390.f + state.mx,570.f - state.my});
+    
+    missile.setRotation(radians(state.thetaM + PI/2.f));
+    jet.setRotation(radians(state.thetaJ));
+    jetHitbox.setPosition(jet.getPosition());
+    jetHitbox.setRotation(jet.getRotation());
+
+    float headX = missile.getPosition().x + std::cos(state.thetaM) * missileLength / 2.f;
+
+    float headY = missile.getPosition().y + std::sin(state.thetaM) * missileLength / 2.f;
+
+    float px = headX - (jet.getPosition().x + 12.f);
+    float py = headY - (jet.getPosition().y) + 6.f;
+
+    float c = std::cos(state.thetaJ);
+    float s = std::sin(state.thetaJ);
+
+    float localX =  px * c + py * s;
+    float localY = -px * s + py * c;
+
+    if (std::abs(localX) <= jetLength * 0.85 / 2.f && std::abs(localY) <= jetHeight * 0.85 / 2.f) paused = true;
+
 
         trajectory.append({missile.getPosition(),Color::Red});
         jetTrajectory.append({jet.getPosition(),Color::Green});
@@ -96,6 +131,7 @@ jet.setPosition({0.f, 270.f});
         window.draw(track);
         window.draw(missile);
         window.draw(jet);
+        window.draw(jetHitbox);
 
         window.display();
     }
