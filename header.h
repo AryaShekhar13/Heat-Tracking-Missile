@@ -11,6 +11,8 @@ struct obj{
 
     float jx_d;
     float jy_d;
+
+    float dist;
 };
 
 extern obj state;

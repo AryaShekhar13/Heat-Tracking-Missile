@@ -6,8 +6,8 @@ using namespace std;
 void physics(float dx, float dy, float& time){
     float dist = std::sqrt(dx * dx + dy * dy);
 
-    float speed_missile = 130.f;
-    float speed_jet = 110.f;
+    float speed_missile = 120.f;
+    float speed_jet = 100.f;
     float A = 100;
     float dt = 0.01f;
     time += dt;
@@ -24,4 +24,5 @@ void physics(float dx, float dy, float& time){
     state.thetaJ = atan2(state.jy_d, state.jx_d);
     state.thetaM = atan2(dy,dx);
 
+    state.dist = dist;
 }

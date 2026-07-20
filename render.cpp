@@ -12,15 +12,15 @@ void render(obj& state){
     RenderWindow window(VideoMode ({800,600}), "Simulation");
     window.setVerticalSyncEnabled(true);
 
-    RectangleShape track({800.f,30.f});
-    track.setPosition({0.f,580.f});
+    RectangleShape track({10000.f,1000.f});
+    track.setPosition({-5000.f,580.f});
     track.setFillColor({70, 70 , 70});
 
-    std::vector<sf::Vector2f> missileTrail;
-    VertexArray trajectory(sf::PrimitiveType::LineStrip);
+    std::vector<Vector2f> missileTrail;
+    VertexArray trajectory(PrimitiveType::LineStrip);
 
-    VertexArray missileTrajectory(sf::PrimitiveType::LineStrip);
-    VertexArray jetTrajectory(sf::PrimitiveType::LineStrip);
+    VertexArray missileTrajectory(PrimitiveType::LineStrip);
+    VertexArray jetTrajectory(PrimitiveType::LineStrip);
 
     Texture bg;
     if (!bg.loadFromFile("../assets/sky.jpeg"))
@@ -70,8 +70,17 @@ void render(obj& state){
     missile.setPosition({390.f, 570.f});
     
     bool paused = false;
+    bool tacticalView = false;
+    bool jetView = false;
+    bool missileView = false;
     int run = 0;
     float total = 0;
+
+    View camera;
+    camera.setSize({800.f,600.f});
+    camera.setCenter({400.f,300.f});
+
+    Vector2f cameraCenter = camera.getCenter();
 
     while(window.isOpen()){
         run++;
@@ -82,6 +91,21 @@ void render(obj& state){
             }
             if(event->is<Event::KeyPressed>() && event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Escape){
                 window.close();
+            }
+            if(event->is<Event::KeyPressed>() && event->getIf<Event::KeyPressed>()->code == Keyboard::Key::T){
+                missileView = false;
+                jetView = false;
+                tacticalView = !tacticalView;
+            }
+            if(event->is<Event::KeyPressed>() && event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Num1){
+                tacticalView = false;
+                missileView = false;
+                jetView = true;
+            }
+            if(event->is<Event::KeyPressed>() && event->getIf<Event::KeyPressed>()->code == Keyboard::Key::Num2){
+                tacticalView = false;
+                jetView = false;
+                missileView = true;
             }
         }
 
@@ -122,6 +146,25 @@ void render(obj& state){
 
         trajectory.append({missile.getPosition(),Color::Red});
         jetTrajectory.append({jet.getPosition(),Color::Green});
+
+        Vector2f desiredCenter;
+        Vector2f missilePos = missile.getPosition();
+        Vector2f jetPos = jet.getPosition();
+        Vector2f missileStart(390.f, 570.f);
+        Vector2f jetStart(0.f , 270.f);
+
+        if(tacticalView == false) desiredCenter = (missilePos + jetPos + missileStart + jetStart)/4.f;
+
+        if(tacticalView == true) desiredCenter = (missilePos+jetPos)/2.f;
+
+        if(jetView == true) desiredCenter = jetPos;
+
+        if(missileView == true) desiredCenter = missilePos;
+
+        cameraCenter += 0.08f*(desiredCenter-cameraCenter);
+        camera.setCenter(cameraCenter);
+
+        window.setView(camera);
 
         window.clear();
         
