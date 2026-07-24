@@ -9,6 +9,7 @@ main.cpp
 render.cpp
 physics.cpp
 header.cpp
+rk4.cpp
 )
 
 find_package(Eigen3 REQUIRED)
